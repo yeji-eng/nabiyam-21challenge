@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F5920B">
+<title>나비얌 × 현대해상 21일 챌린지</title>
+<meta name="description" content="하루 한 번 미션 인증으로 21일의 변화를 만드는 참여형 챌린지">
+</head>
+<body>
+<style>
+  .nabi * { box-sizing: border-box; margin: 0; padding: 0; }
+  .nabi {
+    --ground: #FFFCF6;
+    --card: #FFFFFF;
+    --ink: #2B2622;
+    --muted: #8A8072;
+    --line: #EBE2D2;
+    --sand: #F4ECDC;
+    --honey: #F5920B;
+    --honey-deep: #C96A05;
+    --honey-soft: #FFF2DC;
+    --green: #15A37B;
+    --green-soft: #E3F5EE;
+    --rose: #E36A86;
+    --rose-soft: #FCE8EC;
+    --blue: #3B82C4;
+    --blue-soft: #E6EFF7;
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--ground);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum";
+  }
+  .nabi .wrap { max-width: 560px; margin: 0 auto; padding: 0 18px 120px; }
+  .nabi h1, .nabi h2, .nabi h3 { text-wrap: balance; line-height: 1.25; letter-spacing: -0.02em; }
+  .nabi .num { font-variant-numeric: tabular-nums; }
+  .nabi .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--honey-deep);
+  }
+
+  /* ===== Header ===== */
+  .nabi header { padding: 28px 0 8px; }
+  .nabi .brandrow { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .nabi .brandrow b { color: var(--ink); }
+  .nabi .brandrow .x { color: var(--line); font-weight: 400; }
+  .nabi .hero-title { margin-top: 14px; font-size: 32px; font-weight: 800; }
+  .nabi .hero-title .accent { color: var(--honey); }
+  .nabi .hero-sub { margin-top: 10px; color: var(--muted); font-size: 15px; max-width: 42ch; }
+
+  /* ===== Cards ===== */
+  .nabi .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 18px; padding: 20px;
+  }
+  .nabi section { margin-top: 20px; }
+  .nabi .sechead { display: flex; align-items: baseline; justify-content: space-between; margin: 0 2px 12px; }
+  .nabi .sechead h2 { font-size: 18px; font-weight: 800; }
+  .nabi .sechead .hint { font-size: 13px; color: var(--muted); }
+
+  /* ===== Today mission (hero card) ===== */
+  .nabi .today {
+    background: linear-gradient(165deg, #FFFBF2 0%, #FFF6E6 100%);
+    border: 1px solid var(--line); border-radius: 22px; padding: 22px;
+    box-shadow: 0 10px 30px -18px rgba(201,106,5,0.45);
+  }
+  .nabi .today-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .nabi .daybadge {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: var(--ink); color: #fff; padding: 7px 14px; border-radius: 999px;
+    font-weight: 800; font-size: 14px;
+  }
+  .nabi .daybadge .big { font-size: 20px; }
+  .nabi .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px;
+  }
+  .nabi .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .9; }
+  .nabi .cat-food  { background: var(--honey-soft); color: var(--honey-deep); }
+  .nabi .cat-life  { background: var(--green-soft); color: #0B7A5A; }
+  .nabi .cat-rel   { background: var(--rose-soft); color: #B23E5A; }
+  .nabi .cat-comm  { background: var(--blue-soft); color: #2B6AA8; }
+  .nabi .today h3 { font-size: 23px; font-weight: 800; margin-bottom: 8px; }
+  .nabi .today .how { color: var(--muted); font-size: 14.5px; }
+  .nabi .today .how b { color: var(--honey-deep); font-weight: 700; }
+
+  /* ===== Participant inputs ===== */
+  .nabi .who { display: flex; gap: 10px; margin-bottom: 16px; }
+  .nabi .field { flex: 1; }
+  .nabi .field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .nabi input[type=text] {
+    width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 12px;
+    padding: 11px 13px; font-size: 15px; font-family: inherit; color: var(--ink);
+  }
+  .nabi input[type=text]:focus { outline: 2px solid var(--honey); outline-offset: 1px; border-color: var(--honey); }
+
+  /* ===== Upload ===== */
+  .nabi .uploader { margin-top: 18px; }
+  .nabi .drop {
+    border: 1.5px dashed #E0C9A0; background: #fff; border-radius: 16px;
+    padding: 22px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .nabi .drop:hover { border-color: var(--honey); background: #FFFCF4; }
+  .nabi .drop .ic { font-size: 26px; }
+  .nabi .drop .t { font-weight: 700; margin-top: 6px; font-size: 15px; }
+  .nabi .drop .s { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .nabi .preview { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+  .nabi .preview img { display: block; width: 100%; max-height: 340px; object-fit: cover; }
+  .nabi .preview .redo {
+    position: absolute; top: 10px; right: 10px; background: rgba(43,38,34,.82); color: #fff;
+    border: none; border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+  }
+  .nabi .btn {
+    width: 100%; margin-top: 14px; border: none; border-radius: 14px; cursor: pointer;
+    background: var(--honey); color: #fff; font-weight: 800; font-size: 16px; padding: 15px;
+    font-family: inherit; transition: background .15s, transform .05s;
+  }
+  .nabi .btn:hover { background: var(--honey-deep); }
+  .nabi .btn:active { transform: translateY(1px); }
+  .nabi .btn:disabled { background: #E7DECE; color: #B3A892; cursor: not-allowed; }
+  .nabi .btn.done { background: var(--green); }
+  .nabi .privacy {
+    margin-top: 12px; font-size: 12.5px; color: var(--muted); text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  /* ===== Stamp board ===== */
+  .nabi .weekrow { margin-top: 16px; }
+  .nabi .weeklabel { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 8px; }
+  .nabi .weeklabel .wk { font-size: 13.5px; font-weight: 800; }
+  .nabi .weeklabel .goal { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--sand); color: var(--muted); }
+  .nabi .weeklabel .goal.hit { background: var(--green-soft); color: #0B7A5A; }
+  .nabi .stamps { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+  .nabi .stamp {
+    aspect-ratio: 1; border-radius: 13px; border: 1px solid var(--line); background: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; font-weight: 800; color: var(--muted); font-size: 11px; position: relative;
+    transition: transform .08s, box-shadow .15s;
+  }
+  .nabi .stamp .d { font-size: 13px; }
+  .nabi .stamp:hover { transform: translateY(-2px); }
+  .nabi .stamp.done { background: var(--honey); border-color: var(--honey); color: #fff; box-shadow: 0 6px 14px -8px rgba(201,106,5,.7); }
+  .nabi .stamp.done .mark { font-size: 15px; }
+  .nabi .stamp.next { border: 2px solid var(--honey); color: var(--honey-deep); }
+  .nabi .stamp.future { opacity: .55; cursor: default; }
+  .nabi .stamp.future:hover { transform: none; }
+
+  /* ===== Reward ladder ===== */
+  .nabi .reward { display: flex; gap: 12px; align-items: flex-start; padding: 13px 4px; border-bottom: 1px solid var(--line); }
+  .nabi .reward:last-child { border-bottom: none; }
+  .nabi .reward .dot {
+    flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--sand);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: var(--muted);
+  }
+  .nabi .reward.earned .dot { background: var(--green); color: #fff; }
+  .nabi .reward .rtext { flex: 1; }
+  .nabi .reward .rtext .rt { font-weight: 700; font-size: 15px; }
+  .nabi .reward .rtext .rs { font-size: 13px; color: var(--muted); }
+  .nabi .reward .pts { font-weight: 800; font-size: 15px; color: var(--honey-deep); white-space: nowrap; }
+  .nabi .reward.earned .pts { color: var(--green); }
+  .nabi .reward.bonus { background: var(--honey-soft); border-radius: 12px; border-bottom: none; margin-top: 4px; }
+  .nabi .totalbar {
+    margin-top: 14px; display: flex; align-items: center; justify-content: space-between;
+    background: var(--ink); color: #fff; border-radius: 14px; padding: 14px 18px;
+  }
+  .nabi .totalbar .lab { font-size: 13px; opacity: .8; }
+  .nabi .totalbar .val { font-size: 22px; font-weight: 800; }
+  .nabi .totalbar .val .u { font-size: 14px; opacity: .8; }
+
+  /* ===== Mission list ===== */
+  .nabi details.allm { border: 1px solid var(--line); border-radius: 16px; background: #fff; overflow: hidden; }
+  .nabi details.allm > summary {
+    list-style: none; cursor: pointer; padding: 16px 20px; font-weight: 800; font-size: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nabi details.allm > summary::-webkit-details-marker { display: none; }
+  .nabi details.allm > summary .arr { transition: transform .2s; color: var(--muted); }
+  .nabi details.allm[open] > summary .arr { transform: rotate(180deg); }
+  .nabi .mlist { padding: 0 20px 10px; }
+  .nabi .mweek { font-size: 12px; font-weight: 800; color: var(--honey-deep); letter-spacing: .04em; margin: 14px 0 6px; }
+  .nabi .mitem { display: flex; gap: 11px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .nabi .mitem .md { flex: none; width: 30px; font-weight: 800; color: var(--muted); font-size: 13px; }
+  .nabi .mitem .mt { flex: 1; font-size: 14.5px; }
+  .nabi .mitem .mt .mc { display: inline-block; margin-top: 3px; }
+
+  /* ===== Ops / data section ===== */
+  .nabi .ops { background: #2B2622; color: #F4ECDC; border-radius: 20px; padding: 24px 22px; margin-top: 24px; }
+  .nabi .ops .eyebrow { color: var(--honey); }
+  .nabi .ops h2 { color: #fff; font-size: 20px; font-weight: 800; margin: 8px 0 6px; }
+  .nabi .ops p.lead { color: #D8CDB8; font-size: 14px; }
+  .nabi .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .nabi .metric { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 13px; padding: 13px; }
+  .nabi .metric .mk { font-size: 12.5px; color: var(--honey); font-weight: 800; }
+  .nabi .metric .mv { font-size: 13px; color: #E9E0CE; margin-top: 4px; }
+  .nabi .flow { margin-top: 16px; display: grid; gap: 8px; }
+  .nabi .flowstep { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: #E9E0CE; }
+  .nabi .flowstep .n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--honey); color: #2B2622; font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+  .nabi footer { margin-top: 26px; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+  /* ===== Toast ===== */
+  .nabi .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff; padding: 13px 20px; border-radius: 999px; font-weight: 700;
+    font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,.5);
+  }
+  .nabi .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) { .nabi * { transition: none !important; } }
+</style>
+
+<div class="nabi">
+  <div class="wrap">
+    <header>
+      <div class="brandrow"><b>나비얌</b><span class="x">×</span><b>현대해상</b><span class="x">·</span><span>21일 챌린지</span></div>
+      <h1 class="hero-title">하루 한 걸음,<br><span class="accent">21일의 변화</span>를 함께</h1>
+      <p class="hero-sub">하루에 미션 하나. 사진 한 장으로 인증하면 스탬프가 쌓여요. 3주 동안 꾸준히 참여하고 보상도 받아가세요.</p>
+    </header>
+
+    <!-- 오늘의 미션 -->
+    <section>
+      <div class="today" id="todayCard">
+        <div class="who">
+          <div class="field">
+            <label for="pname">이름(닉네임)</label>
+            <input type="text" id="pname" placeholder="예) 김나비" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pcontact">연락처 뒷자리</label>
+            <input type="text" id="pcontact" placeholder="예) 1234" autocomplete="off" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="today-top">
+          <span class="daybadge"><span>DAY</span><span class="big num" id="dayNum">1</span></span>
+          <span class="chip" id="catChip">식생활</span>
+        </div>
+        <h3 id="mTitle">오늘 먹은 한 끼 사진 남기기</h3>
+        <p class="how" id="mHow"><b>인증 방법 ·</b> 오늘 먹은 밥과 반찬이 보이게 찍어주세요.</p>
+
+        <div class="uploader">
+          <div class="drop" id="drop">
+            <div class="ic">📷</div>
+            <div class="t">인증샷 올리기</div>
+            <div class="s">카메라로 찍거나 사진을 선택하세요</div>
+          </div>
+          <input type="file" id="file" accept="image/*" capture="environment" hidden>
+          <button class="btn" id="submit" disabled>사진을 올리면 제출할 수 있어요</button>
+          <p class="privacy">🔒 올린 사진은 운영팀만 볼 수 있어요. 다른 참여자에게 공개되지 않아요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 스탬프 보드 -->
+    <section>
+      <div class="sechead"><h2>나의 스탬프판</h2><span class="hint" id="stampCount">0 / 21</span></div>
+      <div class="card" id="board"></div>
+    </section>
+
+    <!-- 보상 -->
+    <section>
+      <div class="sechead"><h2>주간 보상</h2><span class="hint">주 5일 이상 참여 시</span></div>
+      <div class="card" id="rewards"></div>
+    </section>
+
+    <!-- 전체 미션 -->
+    <section>
+      <details class="allm">
+        <summary>21일 미션 전체 보기 <span class="arr">▾</span></summary>
+        <div class="mlist" id="mlist"></div>
+      </details>
+    </section>
+
+    <footer>
+      (주)나눔비타민 · 나비얌 × 현대해상 21일 챌린지 (예시 화면)<br>
+      올려주신 사진은 운영 확인 용도로만 사용되며 외부에 공개되지 않습니다.
+    </footer>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ===== 설정: 실제 운영 시 Apps Script 웹앱 주소를 넣으세요. 비우면 데모(연습) 모드로 동작합니다. =====
+  var APPS_SCRIPT_URL = "";
+
+  var CAT = {
+    food: { name: "식생활",      cls: "cat-food" },
+    life: { name: "일상생활",     cls: "cat-life" },
+    rel:  { name: "사회적 관계",  cls: "cat-rel" },
+    comm: { name: "지역사회 참여", cls: "cat-comm" }
+  };
+
+  var MISSIONS = [
+    { d:1,  w:1, c:"food", t:"오늘 먹은 한 끼 사진 남기기",         h:"오늘 먹은 밥과 반찬이 보이게 찍어주세요." },
+    { d:2,  w:1, c:"life", t:"정한 시간에 일어나기",               h:"일어나서 시계나 휴대폰 시간이 보이게 찍어주세요." },
+    { d:3,  w:1, c:"food", t:"물 충분히 마시기",                   h:"오늘 마신 물컵이나 물병을 찍어주세요." },
+    { d:4,  w:1, c:"life", t:"10분 몸 움직이기 (산책·스트레칭)",    h:"바깥 풍경, 운동화, 만보기 화면 등 활동한 걸 찍어주세요." },
+    { d:5,  w:1, c:"food", t:"나비얌 가맹점에서 한 끼 먹기",        h:"가맹점에서 먹은 음식이나 가게를 찍어주세요." },
+    { d:6,  w:1, c:"rel",  t:"고맙다고 말하기",                     h:"고마운 마음을 적은 메모나 함께한 순간을 찍어주세요." },
+    { d:7,  w:1, c:"comm", t:"우리 동네 좋은 가게 소개하기",        h:"소개하고 싶은 동네 가게를 찍어주세요." },
+
+    { d:8,  w:2, c:"food", t:"간단한 음식·간식 만들어 먹기",        h:"직접 만든 음식을 찍어주세요." },
+    { d:9,  w:2, c:"rel",  t:"친구·가족과 함께 밥 먹기",           h:"함께 먹은 밥상을 찍어주세요. (얼굴 안 나와도 돼요)" },
+    { d:10, w:2, c:"life", t:"오늘 감사한 일 3가지 적기",          h:"적은 메모를 찍어주세요." },
+    { d:11, w:2, c:"rel",  t:"가족에게 안부 묻기",                 h:"안부 메시지나 통화 화면을 찍어주세요." },
+    { d:12, w:2, c:"comm", t:"나비얌 가맹점 방문 후 짧은 후기 남기기", h:"방문한 가게와 후기를 적은 메모를 찍어주세요." },
+    { d:13, w:2, c:"food", t:"새로운 음식·메뉴 도전하기",          h:"처음 먹어본 음식을 찍어주세요." },
+    { d:14, w:2, c:"rel",  t:"함께한 사람에게 메시지 보내기",      h:"보낸 메시지 화면을 찍어주세요." },
+
+    { d:15, w:3, c:"comm", t:"우리 동네 깨끗이 하기",              h:"주운 쓰레기나 깨끗해진 자리를 찍어주세요." },
+    { d:16, w:3, c:"life", t:"자기 전 휴대폰 30분 멀리하기",       h:"읽은 책, 잠자리 등 휴대폰 대신 한 일을 찍어주세요." },
+    { d:17, w:3, c:"food", t:"균형 잡힌 한 끼 사진 남기기",        h:"밥·단백질·채소가 보이는 한 끼를 찍어주세요." },
+    { d:18, w:3, c:"rel",  t:"누군가에게 작은 도움 주기",          h:"도움 준 순간이나 그 내용을 적은 메모를 찍어주세요." },
+    { d:19, w:3, c:"comm", t:"나비얌 가맹점에서 한 끼 먹기",       h:"가맹점 음식이나 영수증을 찍어주세요." },
+    { d:20, w:3, c:"life", t:"21일 동안 달라진 점 적어보기",       h:"적은 메모를 찍어주세요." },
+    { d:21, w:3, c:"life", t:"챌린지 후기 + 다음 목표 적기",       h:"후기와 앞으로의 목표를 적은 메모를 찍어주세요." }
+  ];
+
+  var REWARDS = [
+    { label:"1주차 5일 이상 참여", sub:"Day 1 ~ 7", pts:300, week:1 },
+    { label:"2주차 5일 이상 참여", sub:"Day 8 ~ 14", pts:300, week:2 },
+    { label:"3주차 5일 이상 참여", sub:"Day 15 ~ 21", pts:400, week:3 },
+    { label:"3주 모두 목표 달성", sub:"보너스", pts:500, week:0, bonus:true }
+  ];
+  var WEEK_GOAL = 5;
+
+  var KEY = "nabi21_demo";
+  var state = load();
+  var selectedDay = firstIncomplete();
+  var pendingPhoto = null; // {dataUrl, base64, type}
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || { name:"", contact:"", done:{} }; }
+    catch (e) { return { name:"", contact:"", done:{} }; }
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function isDone(d) { return !!state.done[d]; }
+  function doneCount() { return Object.keys(state.done).length; }
+  function firstIncomplete() {
+    for (var i = 1; i <= 21; i++) { if (!isDone(i)) return i; }
+    return 21;
+  }
+  function weekDone(w) {
+    var n = 0;
+    for (var i = 0; i < MISSIONS.length; i++) { if (MISSIONS[i].w === w && isDone(MISSIONS[i].d)) n++; }
+    return n;
+  }
+  function mission(d) { return MISSIONS[d - 1]; }
+
+  // ===== DOM =====
+  var $ = function (id) { return document.getElementById(id); };
+  var pname = $("pname"), pcontact = $("pcontact");
+  var drop = $("drop"), fileInput = $("file"), submitBtn = $("submit");
+
+  pname.value = state.name || "";
+  pcontact.value = state.contact || "";
+  pname.addEventListener("input", function () { state.name = pname.value.trim(); save(); refreshSubmit(); });
+  pcontact.addEventListener("input", function () { state.contact = pcontact.value.trim(); save(); });
+
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._tm); t._tm = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  // ===== Today card =====
+  function renderToday() {
+    var m = mission(selectedDay);
+    var cat = CAT[m.c];
+    $("dayNum").textContent = m.d;
+    var chip = $("catChip"); chip.textContent = cat.name; chip.className = "chip " + cat.cls;
+    $("mTitle").textContent = m.t;
+    $("mHow").innerHTML = "<b>인증 방법 ·</b> " + m.h;
+    resetUploader(isDone(m.d));
+  }
+
+  function resetUploader(done) {
+    pendingPhoto = null;
+    var up = drop.parentNode;
+    var old = up.querySelector(".preview");
+    if (old) up.removeChild(old);
+    drop.style.display = "";
+    if (done) {
+      drop.style.display = "none";
+      submitBtn.className = "btn done";
+      submitBtn.textContent = "✓ Day " + selectedDay + " 인증 완료";
+      submitBtn.disabled = true;
+    } else {
+      submitBtn.className = "btn";
+      refreshSubmit();
+    }
+  }
+
+  function refreshSubmit() {
+    if (isDone(selectedDay)) return;
+    var ready = pendingPhoto && state.name;
+    submitBtn.disabled = !ready;
+    submitBtn.textContent = !state.name ? "이름을 먼저 입력해 주세요"
+      : !pendingPhoto ? "사진을 올리면 제출할 수 있어요"
+      : "Day " + selectedDay + " 인증 제출하기";
+  }
+
+  drop.addEventListener("click", function () { fileInput.click(); });
+  fileInput.addEventListener("change", function () {
+    var f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var dataUrl = ev.target.result;
+      pendingPhoto = { dataUrl: dataUrl, base64: dataUrl.split(",")[1], type: f.type || "image/jpeg" };
+      showPreview(dataUrl);
+      refreshSubmit();
+    };
+    reader.readAsDataURL(f);
+  });
+
+  function showPreview(dataUrl) {
+    var up = drop.parentNode;
+    var old = up.querySelector(".preview");
+    if (old) up.removeChild(old);
+    drop.style.display = "none";
+    var box = document.createElement("div");
+    box.className = "preview";
+    var img = document.createElement("img"); img.src = dataUrl; img.alt = "미션 인증 사진 미리보기";
+    var redo = document.createElement("button"); redo.className = "redo"; redo.type = "button"; redo.textContent = "다시 찍기";
+    redo.addEventListener("click", function () { resetUploader(false); });
+    box.appendChild(img); box.appendChild(redo);
+    up.insertBefore(box, fileInput);
+  }
+
+  submitBtn.addEventListener("click", function () {
+    if (submitBtn.disabled) return;
+    var m = mission(selectedDay);
+    submitBtn.disabled = true; submitBtn.textContent = "제출 중...";
+
+    var payload = {
+      name: state.name, contact: state.contact,
+      day: m.d, week: m.w, category: CAT[m.c].name, mission: m.t,
+      imageBase64: pendingPhoto ? pendingPhoto.base64 : "",
+      imageType: pendingPhoto ? pendingPhoto.type : ""
+    };
+
+    if (APPS_SCRIPT_URL) {
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).then(function () { onSubmitted(m); })
+        .catch(function () { onSubmitted(m); }); // 응답 CORS 제한 시에도 저장은 완료됨
+    } else {
+      setTimeout(function () { onSubmitted(m); }, 500); // 데모 모드
+    }
+  });
+
+  function onSubmitted(m) {
+    state.done[m.d] = { ts: new Date().toISOString() };
+    save();
+    toast("🦋 Day " + m.d + " 인증 완료! 스탬프를 받았어요");
+    selectedDay = firstIncomplete();
+    renderAll();
+  }
+
+  // ===== Board =====
+  function renderBoard() {
+    var board = $("board"); board.innerHTML = "";
+    var next = firstIncomplete();
+    for (var w = 1; w <= 3; w++) {
+      var wd = weekDone(w);
+      var row = document.createElement("div"); row.className = "weekrow";
+      var lab = document.createElement("div"); lab.className = "weeklabel";
+      var hit = wd >= WEEK_GOAL;
+      lab.innerHTML = '<span class="wk">' + w + '주차</span>' +
+        '<span class="goal ' + (hit ? "hit" : "") + '">' + (hit ? "목표 달성 " : "") + wd + ' / ' + WEEK_GOAL + '일</span>';
+      row.appendChild(lab);
+      var grid = document.createElement("div"); grid.className = "stamps";
+      for (var i = 0; i < 7; i++) {
+        var d = (w - 1) * 7 + i + 1;
+        var cell = document.createElement("button");
+        cell.type = "button";
+        var done = isDone(d);
+        cell.className = "stamp" + (done ? " done" : d === next ? " next" : d > next ? " future" : "");
+        cell.innerHTML = done
+          ? '<span class="mark">🦋</span><span class="d num">' + d + '</span>'
+          : '<span class="d num">' + d + '</span><span style="font-size:9px;font-weight:600;">Day</span>';
+        (function (day, isFuture) {
+          cell.addEventListener("click", function () {
+            if (isFuture && !isDone(day)) { toast("이전 미션부터 차례로 인증해 주세요"); return; }
+            selectedDay = day; renderToday();
+            $("todayCard").scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        })(d, d > next);
+        grid.appendChild(cell);
+      }
+      row.appendChild(grid); board.appendChild(row);
+    }
+    $("stampCount").textContent = doneCount() + " / 21";
+  }
+
+  // ===== Rewards =====
+  function renderRewards() {
+    var box = $("rewards"); box.innerHTML = "";
+    var allHit = weekDone(1) >= WEEK_GOAL && weekDone(2) >= WEEK_GOAL && weekDone(3) >= WEEK_GOAL;
+    var total = 0;
+    for (var i = 0; i < REWARDS.length; i++) {
+      var r = REWARDS[i];
+      var earned = r.bonus ? allHit : weekDone(r.week) >= WEEK_GOAL;
+      if (earned) total += r.pts;
+      var row = document.createElement("div");
+      row.className = "reward" + (earned ? " earned" : "") + (r.bonus ? " bonus" : "");
+      var prog = r.bonus ? (allHit ? "달성!" : "3주 목표를 모두 달성하면")
+        : (weekDone(r.week) + " / " + WEEK_GOAL + "일" + (earned ? " · 달성!" : ""));
+      row.innerHTML =
+        '<div class="dot">' + (earned ? "✓" : (r.bonus ? "★" : r.week + "주")) + '</div>' +
+        '<div class="rtext"><div class="rt">' + r.label + '</div><div class="rs">' + r.sub + " · " + prog + '</div></div>' +
+        '<div class="pts">' + r.pts + "P</div>";
+      box.appendChild(row);
+    }
+    var bar = document.createElement("div"); bar.className = "totalbar";
+    bar.innerHTML = '<span class="lab">지금까지 받은 포인트</span><span class="val num">' + total + '<span class="u">P</span> <span class="u">/ 최대 1,500P</span></span>';
+    box.appendChild(bar);
+  }
+
+  // ===== Mission list =====
+  function renderList() {
+    var box = $("mlist"); box.innerHTML = "";
+    var titles = { 1:"1주차 · 나를 챙기기", 2:"2주차 · 관계 넓히기", 3:"3주차 · 세상과 연결되기" };
+    for (var w = 1; w <= 3; w++) {
+      var h = document.createElement("div"); h.className = "mweek"; h.textContent = titles[w]; box.appendChild(h);
+      for (var i = 0; i < MISSIONS.length; i++) {
+        var m = MISSIONS[i]; if (m.w !== w) continue;
+        var cat = CAT[m.c];
+        var item = document.createElement("div"); item.className = "mitem";
+        item.innerHTML = '<div class="md num">D' + m.d + '</div><div class="mt">' + m.t +
+          '<br><span class="chip ' + cat.cls + ' mc">' + cat.name + '</span></div>';
+        box.appendChild(item);
+      }
+    }
+  }
+
+  function renderAll() { renderToday(); renderBoard(); renderRewards(); }
+  renderList();
+  renderAll();
+})();
+</script>
+</body>
+</html>
