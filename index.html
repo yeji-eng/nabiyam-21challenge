@@ -127,6 +127,27 @@
   .nabi .today .how { color: var(--muted); font-size: 14.5px; }
   .nabi .today .how b { color: var(--honey-deep); font-weight: 700; }
 
+  /* ===== Schedule strip ===== */
+  .nabi .schedule { display: flex; gap: 7px; margin-top: 16px; }
+  .nabi .wkchip { flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 13px; padding: 10px 8px; text-align: center; }
+  .nabi .wkchip .wl { font-size: 11px; font-weight: 800; color: var(--muted); }
+  .nabi .wkchip .wd { font-size: 11px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .nabi .wkchip .ws { font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: .02em; }
+  .nabi .wkchip.active { border-color: var(--honey); background: var(--honey-soft); }
+  .nabi .wkchip.active .wl, .nabi .wkchip.active .ws { color: var(--honey-deep); }
+  .nabi .wkchip.ended { opacity: .5; }
+  .nabi .wkchip.upcoming .ws { color: var(--muted); }
+
+  /* ===== Status message (시작 전 / 종료 / 주간 완료) ===== */
+  .nabi .statusmsg { text-align: center; padding: 18px 10px 8px; }
+  .nabi .statusmsg .big { font-size: 34px; line-height: 1; }
+  .nabi .statusmsg .st { font-weight: 800; font-size: 19px; margin-top: 10px; }
+  .nabi .statusmsg .ss { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .nabi .statusmsg .dday { display: inline-block; margin-top: 14px; background: var(--ink); color: #fff; font-weight: 800; padding: 7px 16px; border-radius: 999px; font-size: 14px; }
+  .nabi .stamp.locked { opacity: .45; cursor: default; }
+  .nabi .stamp.locked:hover { transform: none; }
+  .nabi .stamp.locked .mark { font-size: 12px; }
+
   /* ===== Upload ===== */
   .nabi .uploader { margin-top: 18px; }
   .nabi .drop { border: 1.5px dashed #E0C9A0; background: #fff; border-radius: 16px; padding: 22px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
@@ -246,23 +267,28 @@
         <div class="sub" id="greetSub">오늘의 미션을 인증하고 스탬프를 모아보세요.</div>
       </div>
 
-      <div class="today" id="todayCard">
-        <div class="today-top">
-          <span class="daybadge"><span>DAY</span><span class="big num" id="dayNum">1</span></span>
-          <span class="chip" id="catChip">식생활</span>
-        </div>
-        <h3 id="mTitle">오늘 먹은 한 끼 사진 남기기</h3>
-        <p class="how" id="mHow"><b>인증 방법 ·</b> 오늘 먹은 밥과 반찬이 보이게 찍어주세요.</p>
+      <div class="schedule" id="schedule"></div>
 
-        <div class="uploader">
-          <div class="drop" id="drop">
-            <div class="ic">📷</div>
-            <div class="t">인증샷 올리기</div>
-            <div class="s">카메라로 찍거나 사진을 선택하세요</div>
+      <div class="today" id="todayCard">
+        <div id="statusMsg" class="statusmsg" hidden></div>
+        <div id="missionBody">
+          <div class="today-top">
+            <span class="daybadge"><span>DAY</span><span class="big num" id="dayNum">1</span></span>
+            <span class="chip" id="catChip">식생활</span>
           </div>
-          <input type="file" id="file" accept="image/*" capture="environment" hidden>
-          <button class="btn" id="submit" disabled>사진을 올리면 제출할 수 있어요</button>
-          <p class="lock">🔒 올린 사진은 운영팀만 볼 수 있어요. 다른 참여자에게 공개되지 않아요.</p>
+          <h3 id="mTitle">오늘 먹은 한 끼 사진 남기기</h3>
+          <p class="how" id="mHow"><b>인증 방법 ·</b> 오늘 먹은 밥과 반찬이 보이게 찍어주세요.</p>
+
+          <div class="uploader">
+            <div class="drop" id="drop">
+              <div class="ic">📷</div>
+              <div class="t">인증샷 올리기</div>
+              <div class="s">카메라로 찍거나 사진을 선택하세요</div>
+            </div>
+            <input type="file" id="file" accept="image/*" capture="environment" hidden>
+            <button class="btn" id="submit" disabled>사진을 올리면 제출할 수 있어요</button>
+            <p class="lock">🔒 올린 사진은 운영팀만 볼 수 있어요. 다른 참여자에게 공개되지 않아요.</p>
+          </div>
         </div>
       </div>
 
@@ -346,6 +372,35 @@
     { label:"3주 모두 목표 달성",  sub:"보너스",       pts:500, week:0, bonus:true }
   ];
   var WEEK_GOAL = 3;
+
+  // ===== 챌린지 기간 설정 (여기 날짜만 바꾸면 됩니다 · 한국시간 기준) =====
+  var SCHEDULE = [
+    { start: new Date("2026-11-30T00:00:00"), end: new Date("2026-12-06T23:59:59") }, // 1주차
+    { start: new Date("2026-12-07T00:00:00"), end: new Date("2026-12-13T23:59:59") }, // 2주차
+    { start: new Date("2026-12-14T00:00:00"), end: new Date("2026-12-20T23:59:59") }  // 3주차
+  ];
+
+  // 평소엔 실제 현재 시각. 테스트할 땐 주소에 ?now=2026-12-01 처럼 붙이면 그 날짜로 흉내 냅니다.
+  var TEST_NOW = null;
+  try {
+    var q = new URLSearchParams(location.search).get("now");
+    if (q) { var t = new Date(q); if (!isNaN(t)) TEST_NOW = t; }
+  } catch (e) {}
+  function now() { return TEST_NOW ? new Date(TEST_NOW) : new Date(); }
+  function md(dt) { return (dt.getMonth() + 1) + "/" + dt.getDate(); }
+  function weekState(w) {
+    var s = SCHEDULE[w - 1], n = now();
+    if (n < s.start) return "upcoming";
+    if (n > s.end) return "ended";
+    return "active";
+  }
+  function activeWeek() { for (var w = 1; w <= 3; w++) if (weekState(w) === "active") return w; return null; }
+  function phase() {
+    if (now() < SCHEDULE[0].start) return "before";
+    if (now() > SCHEDULE[2].end) return "after";
+    return "running";
+  }
+  function dday(dt) { return Math.max(0, Math.ceil((dt - now()) / 86400000)); }
 
   // 사전 설문 (문구는 예시 — 식생활·지역교류 기준선 측정용)
   var SURVEY = [
@@ -479,7 +534,7 @@
     $("greetSub").textContent = returning
       ? "다시 오셨네요! 오늘의 미션을 인증해 보세요."
       : "오늘의 미션을 인증하고 스탬프를 모아보세요.";
-    selectedDay = firstIncomplete();
+    selectedDay = defaultDay();
     renderList();
     renderAll();
     showView("challenge");
@@ -488,12 +543,59 @@
   function isDone(d) { return !!user.done[d]; }
   function doneCount() { return Object.keys(user.done).length; }
   function firstIncomplete() { for (var i = 1; i <= 21; i++) if (!isDone(i)) return i; return 21; }
+  function firstIncompleteInWeek(w) { for (var d = (w - 1) * 7 + 1; d <= w * 7; d++) if (!isDone(d)) return d; return null; }
   function weekDone(w) { var n = 0; MISSIONS.forEach(function (m) { if (m.w === w && isDone(m.d)) n++; }); return n; }
   function mission(d) { return MISSIONS[d - 1]; }
+  function defaultDay() {
+    var aw = activeWeek();
+    if (!aw) return 1;
+    return firstIncompleteInWeek(aw) || (aw - 1) * 7 + 1;
+  }
 
   var drop = $("drop"), fileInput = $("file"), submitBtn = $("submit");
 
+  function renderSchedule() {
+    var box = $("schedule"); box.innerHTML = "";
+    var labels = { active: "진행 중", ended: "종료", upcoming: "예정" };
+    for (var w = 1; w <= 3; w++) {
+      var st = weekState(w), s = SCHEDULE[w - 1];
+      var chip = document.createElement("div");
+      chip.className = "wkchip " + st;
+      chip.innerHTML = '<div class="wl">' + w + '주차</div><div class="wd">' + md(s.start) + '–' + md(s.end) +
+        '</div><div class="ws">' + labels[st] + '</div>';
+      box.appendChild(chip);
+    }
+  }
+
   function renderToday() {
+    var p = phase(), statusEl = $("statusMsg"), bodyEl = $("missionBody");
+
+    if (p === "before") {
+      bodyEl.hidden = true; statusEl.hidden = false;
+      statusEl.innerHTML = '<div class="big">🗓️</div><div class="st">곧 시작해요!</div>' +
+        '<div class="ss">1주차 미션은 ' + md(SCHEDULE[0].start) + '부터 열려요. 그때 다시 만나요 🦋</div>' +
+        '<div class="dday">시작까지 D-' + dday(SCHEDULE[0].start) + '</div>';
+      return;
+    }
+    if (p === "after") {
+      bodyEl.hidden = true; statusEl.hidden = false;
+      statusEl.innerHTML = '<div class="big">🎉</div><div class="st">챌린지가 끝났어요</div>' +
+        '<div class="ss">그동안 ' + doneCount() + '개의 미션을 인증했어요. 함께해 주셔서 고마워요!</div>';
+      return;
+    }
+
+    var aw = activeWeek();
+    if (mission(selectedDay).w !== aw) selectedDay = defaultDay();
+
+    if (firstIncompleteInWeek(aw) === null) {
+      bodyEl.hidden = true; statusEl.hidden = false;
+      var next = aw < 3 ? ('다음 주차는 ' + md(SCHEDULE[aw].start) + '에 열려요.') : '3주 챌린지를 끝까지 완주했어요!';
+      statusEl.innerHTML = '<div class="big">✅</div><div class="st">이번 주 미션 완료!</div>' +
+        '<div class="ss">' + aw + '주차 미션을 모두 인증했어요. ' + next + '</div>';
+      return;
+    }
+
+    statusEl.hidden = true; bodyEl.hidden = false;
     var m = mission(selectedDay), cat = CAT[m.c];
     $("dayNum").textContent = m.d;
     var chip = $("catChip"); chip.textContent = cat.name; chip.className = "chip " + cat.cls;
@@ -552,6 +654,7 @@
   submitBtn.addEventListener("click", function () {
     if (submitBtn.disabled) return;
     var m = mission(selectedDay);
+    if (m.w !== activeWeek() || isDone(m.d)) { toast("지금은 이 미션을 인증할 수 없어요"); renderToday(); return; }
     submitBtn.disabled = true; submitBtn.textContent = "제출 중...";
     sendToServer({
       type: "mission", name: user.name, contact: user.phone,
@@ -578,9 +681,8 @@
 
   function renderBoard() {
     var board = $("board"); board.innerHTML = "";
-    var next = firstIncomplete();
     for (var w = 1; w <= 3; w++) {
-      var wd = weekDone(w), hit = wd >= WEEK_GOAL;
+      var wd = weekDone(w), hit = wd >= WEEK_GOAL, ws = weekState(w), nextInWeek = firstIncompleteInWeek(w);
       var row = document.createElement("div"); row.className = "weekrow";
       var lab = document.createElement("div"); lab.className = "weeklabel";
       lab.innerHTML = '<span class="wk">' + w + '주차</span><span class="goal ' + (hit ? "hit" : "") + '">' + (hit ? "목표 달성 " : "") + wd + ' / ' + WEEK_GOAL + '회</span>';
@@ -588,18 +690,26 @@
       var grid = document.createElement("div"); grid.className = "stamps";
       for (var i = 0; i < 7; i++) {
         var d = (w - 1) * 7 + i + 1, done = isDone(d);
-        var cell = document.createElement("button"); cell.type = "button";
-        cell.className = "stamp" + (done ? " done" : d === next ? " next" : d > next ? " future" : "");
+        var cls = "stamp";
+        if (done) cls += " done";
+        else if (ws === "active") cls += (d === nextInWeek ? " next" : "");
+        else if (ws === "upcoming") cls += " future";
+        else cls += " locked";
+        var cell = document.createElement("button"); cell.type = "button"; cell.className = cls;
+        var tag = done ? "" : (ws === "upcoming" ? "예정" : ws === "ended" ? "마감" : "Day");
         cell.innerHTML = done
           ? '<span class="mark">🦋</span><span class="d num">' + d + '</span>'
-          : '<span class="d num">' + d + '</span><span style="font-size:9px;font-weight:600;">Day</span>';
-        (function (day) {
+          : '<span class="d num">' + d + '</span><span style="font-size:9px;font-weight:600;">' + tag + '</span>';
+        (function (day, week) {
           cell.addEventListener("click", function () {
-            if (day > firstIncomplete() && !isDone(day)) { toast("이전 미션부터 차례로 인증해 주세요"); return; }
+            if (isDone(day)) { toast("이미 인증한 미션이에요 🦋"); return; }
+            var st = weekState(week), s = SCHEDULE[week - 1];
+            if (st === "upcoming") { toast(week + "주차는 " + md(s.start) + "에 열려요"); return; }
+            if (st === "ended") { toast(week + "주차 기간이 끝났어요 (" + md(s.start) + "–" + md(s.end) + ")"); return; }
             selectedDay = day; renderToday();
             $("todayCard").scrollIntoView({ behavior: "smooth", block: "start" });
           });
-        })(d);
+        })(d, w);
         grid.appendChild(cell);
       }
       row.appendChild(grid); board.appendChild(row);
@@ -643,7 +753,7 @@
     }
   }
 
-  function renderAll() { renderToday(); renderBoard(); renderRewards(); }
+  function renderAll() { renderSchedule(); renderToday(); renderBoard(); renderRewards(); }
 
   // ===== 시작: 이전에 참여했고 설문까지 끝낸 사람은 자동으로 챌린지로 =====
   if (DB.current && DB.users[DB.current]) {
