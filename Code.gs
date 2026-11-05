@@ -25,13 +25,15 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
 
-    // 사전 설문 접수 (처음 참여자만 1회)
-    if (data.type === 'survey') {
-      var sv = getSurveySheet_(data.survey);
+    // 설문 접수: 사전(survey) / 사후(postsurvey)
+    if (data.type === 'survey' || data.type === 'postsurvey') {
+      var tabName = data.type === 'postsurvey' ? '사후설문' : '사전설문';
+      var headColor = data.type === 'postsurvey' ? '#FFE8CC' : '#E3F5EE';
+      var sv = getSurveySheet_(tabName, data.survey, headColor);
       var qKeys = Object.keys(data.survey || {});
       var answers = qKeys.map(function (k) { return data.survey[k]; });
       sv.appendRow([new Date(), data.name || '', data.contact || ''].concat(answers));
-      return json_({ ok: true, type: 'survey' });
+      return json_({ ok: true, type: data.type });
     }
 
     // 1) 사진을 비공개 폴더에 저장
@@ -88,15 +90,15 @@ function getSheet_() {
   return sheet;
 }
 
-/** 사전 설문 탭. 질문 개수에 맞춰 머리글(Q1, Q2...)을 자동 생성 */
-function getSurveySheet_(survey) {
+/** 설문 탭(사전/사후). 질문 개수에 맞춰 머리글(Q1, Q2...)을 자동 생성 */
+function getSurveySheet_(tabName, survey, headColor) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('사전설문');
+  var sheet = ss.getSheetByName(tabName);
   if (!sheet) {
-    sheet = ss.insertSheet('사전설문');
+    sheet = ss.insertSheet(tabName);
     var head = ['제출시각', '이름', '연락처뒷자리'].concat(Object.keys(survey || {}));
     sheet.appendRow(head);
-    sheet.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground('#E3F5EE');
+    sheet.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground(headColor || '#E3F5EE');
     sheet.setFrozenRows(1);
   }
   return sheet;
