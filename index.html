@@ -366,11 +366,13 @@
   };
 
   var REWARDS = [
-    { label:"1주차 3회 이상 참여", sub:"Day 1 ~ 7",   pts:300, week:1 },
-    { label:"2주차 3회 이상 참여", sub:"Day 8 ~ 14",  pts:300, week:2 },
-    { label:"3주차 3회 이상 참여", sub:"Day 15 ~ 21", pts:400, week:3 },
-    { label:"3주 모두 목표 달성",  sub:"보너스",       pts:500, week:0, bonus:true }
+    { label:"1주차 3회 이상 참여", sub:"Day 1 ~ 7",   pts:1000, week:1 },
+    { label:"2주차 3회 이상 참여", sub:"Day 8 ~ 14",  pts:2000, week:2 },
+    { label:"3주차 3회 이상 참여", sub:"Day 15 ~ 21", pts:2000, week:3 },
+    { label:"3주 모두 완주 보너스", sub:"보너스",      pts:5000, week:0, bonus:true }
   ];
+  var MAX_REWARD = 10000;
+  function won(n) { return n.toLocaleString("ko-KR"); }
   var WEEK_GOAL = 3;
 
   // ===== 챌린지 기간 설정 (여기 날짜만 바꾸면 됩니다 · 한국시간 기준) =====
@@ -730,11 +732,11 @@
       row.className = "reward" + (earned ? " earned" : "") + (r.bonus ? " bonus" : "");
       row.innerHTML = '<div class="dot">' + (earned ? "✓" : (r.bonus ? "★" : r.week + "주")) + '</div>' +
         '<div class="rtext"><div class="rt">' + r.label + '</div><div class="rs">' + r.sub + " · " + prog + '</div></div>' +
-        '<div class="pts">' + r.pts + "P</div>";
+        '<div class="pts">' + won(r.pts) + "원</div>";
       box.appendChild(row);
     });
     var bar = document.createElement("div"); bar.className = "totalbar";
-    bar.innerHTML = '<span class="lab">지금까지 받은 포인트</span><span class="val num">' + total + '<span class="u">P</span> <span class="u">/ 최대 1,500P</span></span>';
+    bar.innerHTML = '<span class="lab">지금까지 받은 금액</span><span class="val num">' + won(total) + '<span class="u">원</span> <span class="u">/ 최대 ' + won(MAX_REWARD) + '원</span></span>';
     box.appendChild(bar);
   }
 
