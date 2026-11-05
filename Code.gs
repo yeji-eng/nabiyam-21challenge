@@ -25,6 +25,15 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
 
+    // 사전 설문 접수 (처음 참여자만 1회)
+    if (data.type === 'survey') {
+      var sv = getSurveySheet_(data.survey);
+      var qKeys = Object.keys(data.survey || {});
+      var answers = qKeys.map(function (k) { return data.survey[k]; });
+      sv.appendRow([new Date(), data.name || '', data.contact || ''].concat(answers));
+      return json_({ ok: true, type: 'survey' });
+    }
+
     // 1) 사진을 비공개 폴더에 저장
     var fileUrl = '', fileId = '';
     if (data.imageBase64) {
@@ -74,6 +83,20 @@ function getSheet_() {
     sheet = ss.insertSheet(SHEET_NAME);
     sheet.appendRow(HEADERS);
     sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold').setBackground('#FFF2DC');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+/** 사전 설문 탭. 질문 개수에 맞춰 머리글(Q1, Q2...)을 자동 생성 */
+function getSurveySheet_(survey) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('사전설문');
+  if (!sheet) {
+    sheet = ss.insertSheet('사전설문');
+    var head = ['제출시각', '이름', '연락처뒷자리'].concat(Object.keys(survey || {}));
+    sheet.appendRow(head);
+    sheet.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground('#E3F5EE');
     sheet.setFrozenRows(1);
   }
   return sheet;
