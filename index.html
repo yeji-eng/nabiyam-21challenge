@@ -682,15 +682,12 @@
   function renderSchedule() {
     var box = $("schedule"); box.innerHTML = "";
     var labels = { active: "진행 중", ended: "종료", upcoming: "예정" };
-    var pre = phase() === "before";
     for (var w = 1; w <= 3; w++) {
       var st = weekState(w), s = SCHEDULE[w - 1];
-      var cls = "wkchip " + st, lbl = labels[st];
-      if (pre && w === 1) { cls = "wkchip active"; lbl = "배정"; }  // 시작 전: 1주차를 배정으로 강조
       var chip = document.createElement("div");
-      chip.className = cls;
+      chip.className = "wkchip " + st;
       chip.innerHTML = '<div class="wl">' + w + '주차</div><div class="wd">' + md(s.start) + '–' + md(s.end) +
-        '</div><div class="ws">' + lbl + '</div>';
+        '</div><div class="ws">' + labels[st] + '</div>';
       box.appendChild(chip);
     }
   }
