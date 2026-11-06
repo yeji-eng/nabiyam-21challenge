@@ -141,11 +141,11 @@
   .nabi .wkchip { flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 13px; padding: 10px 8px; text-align: center; }
   .nabi .wkchip .wl { font-size: 11px; font-weight: 800; color: var(--muted); }
   .nabi .wkchip .wd { font-size: 11px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .nabi .wkchip .ws { font-size: 10px; font-weight: 800; margin-top: 4px; letter-spacing: .02em; }
+  .nabi .wkchip .ws { display: inline-block; margin-top: 6px; padding: 2px 11px; border-radius: 999px; background: var(--line); color: var(--muted); font-size: 10.5px; font-weight: 800; letter-spacing: .02em; }
   .nabi .wkchip.active { border-color: var(--honey); background: var(--honey-soft); }
-  .nabi .wkchip.active .wl, .nabi .wkchip.active .ws { color: var(--honey-deep); }
+  .nabi .wkchip.active .wl { color: var(--honey-deep); }
+  .nabi .wkchip.active .ws { background: var(--honey); color: var(--dark); }
   .nabi .wkchip.ended { opacity: .5; }
-  .nabi .wkchip.upcoming .ws { color: var(--muted); }
 
   /* ===== Status message (시작 전 / 종료 / 주간 완료) ===== */
   .nabi .statusmsg { text-align: center; padding: 18px 10px 8px; }
@@ -153,6 +153,17 @@
   .nabi .statusmsg .st { font-weight: 800; font-size: 19px; margin-top: 10px; }
   .nabi .statusmsg .ss { color: var(--muted); font-size: 14px; margin-top: 6px; }
   .nabi .statusmsg .dday { display: inline-block; margin-top: 14px; background: var(--ink); color: #fff; font-weight: 800; padding: 7px 16px; border-radius: 999px; font-size: 14px; }
+  /* 시작 전 안내 카드 (일러스트 + 내용 가로 배치) */
+  .nabi .statusmsg.before { text-align: left; padding: 6px 2px; }
+  .nabi .precard { display: flex; gap: 16px; align-items: center; }
+  .nabi .preillo { flex: none; width: 92px; }
+  .nabi .preillo svg { width: 100%; height: auto; display: block; }
+  .nabi .prebody { flex: 1; min-width: 0; }
+  .nabi .prebadge { display: inline-block; background: var(--dark); color: var(--honey); font-weight: 800; font-size: 12px; padding: 5px 12px; border-radius: 999px; }
+  .nabi .pretitle { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-top: 10px; }
+  .nabi .presub { color: var(--honey-deep); font-size: 14px; line-height: 1.5; margin-top: 6px; }
+  .nabi .statusmsg.before .dday { margin-top: 14px; }
+  @media (max-width: 360px) { .nabi .preillo { width: 72px; } .nabi .pretitle { font-size: 24px; } }
   .nabi .stamp.locked { opacity: .45; cursor: default; }
   .nabi .stamp.locked:hover { transform: none; }
   .nabi .stamp.locked .mark { font-size: 12px; }
@@ -285,8 +296,8 @@
     <!-- =================== VIEW 3: 챌린지 =================== -->
     <section id="view-challenge" class="view" hidden>
       <div class="greet">
-        <div class="hi"><span class="name" id="greetName">OO</span>님, 오늘도 한 걸음 🦋</div>
-        <div class="sub" id="greetSub">오늘의 미션을 인증하고 스탬프를 모아보세요.</div>
+        <div class="hi"><span class="name" id="greetName">OO</span>님, 오늘도 한 걸음 🐾</div>
+        <div class="sub" id="greetSub">일주일에 3번, 나만의 속도로 참여해요.</div>
       </div>
 
       <div class="schedule" id="schedule"></div>
@@ -345,6 +356,23 @@
 
   // 실제 운영 시 Apps Script 웹앱 주소. 비우면 데모(연습) 모드.
   var APPS_SCRIPT_URL = "";
+
+  // 시작 전 안내 카드용 달력 일러스트
+  var CALENDAR_SVG =
+    '<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="달력">' +
+      '<g stroke="#F5B301" stroke-width="3.4" stroke-linecap="round">' +
+        '<line x1="7" y1="32" x2="16" y2="32"/><line x1="11" y1="19" x2="18" y2="25"/><line x1="11" y1="45" x2="18" y2="39"/>' +
+      '</g>' +
+      '<rect x="24" y="26" width="62" height="58" rx="11" fill="#FFFFFF" stroke="#E5A600" stroke-width="3"/>' +
+      '<path d="M24 37a11 11 0 0 1 11-11h40a11 11 0 0 1 11 11v7H24z" fill="#FFBD00"/>' +
+      '<rect x="39" y="15" width="6" height="19" rx="3" fill="#8A6A00"/>' +
+      '<rect x="65" y="15" width="6" height="19" rx="3" fill="#8A6A00"/>' +
+      '<g fill="#F0D79A">' +
+        '<rect x="33" y="52" width="11" height="9" rx="2.5"/><rect x="49" y="52" width="11" height="9" rx="2.5"/><rect x="65" y="52" width="11" height="9" rx="2.5"/>' +
+        '<rect x="33" y="66" width="11" height="9" rx="2.5"/><rect x="65" y="66" width="11" height="9" rx="2.5"/>' +
+      '</g>' +
+      '<rect x="49" y="66" width="11" height="9" rx="2.5" fill="#FFBD00"/>' +
+    '</svg>';
 
   var CAT = {
     food: { name: "식생활",       cls: "cat-food" },
@@ -626,9 +654,11 @@
   function enterChallenge(returning) {
     if (shouldPostSurvey()) { enterPostSurvey(); return; }
     $("greetName").textContent = user.name;
-    $("greetSub").textContent = returning
-      ? "다시 오셨네요! 오늘의 미션을 인증해 보세요."
-      : "오늘의 미션을 인증하고 스탬프를 모아보세요.";
+    $("greetSub").textContent = (phase() === "before")
+      ? "일주일에 3번, 나만의 속도로 참여해요."
+      : returning
+        ? "다시 오셨네요! 오늘의 미션을 인증해 보세요."
+        : "오늘의 미션을 인증하고 스탬프를 모아보세요.";
     selectedDay = defaultDay();
     renderList();
     renderAll();
@@ -652,12 +682,15 @@
   function renderSchedule() {
     var box = $("schedule"); box.innerHTML = "";
     var labels = { active: "진행 중", ended: "종료", upcoming: "예정" };
+    var pre = phase() === "before";
     for (var w = 1; w <= 3; w++) {
       var st = weekState(w), s = SCHEDULE[w - 1];
+      var cls = "wkchip " + st, lbl = labels[st];
+      if (pre && w === 1) { cls = "wkchip active"; lbl = "배정"; }  // 시작 전: 1주차를 배정으로 강조
       var chip = document.createElement("div");
-      chip.className = "wkchip " + st;
+      chip.className = cls;
       chip.innerHTML = '<div class="wl">' + w + '주차</div><div class="wd">' + md(s.start) + '–' + md(s.end) +
-        '</div><div class="ws">' + labels[st] + '</div>';
+        '</div><div class="ws">' + lbl + '</div>';
       box.appendChild(chip);
     }
   }
@@ -667,11 +700,20 @@
 
     if (p === "before") {
       bodyEl.hidden = true; statusEl.hidden = false;
-      statusEl.innerHTML = '<div class="big">🗓️</div><div class="st">곧 시작해요!</div>' +
-        '<div class="ss">1주차 미션은 ' + md(SCHEDULE[0].start) + '부터 열려요. 그때 다시 만나요 🦋</div>' +
-        '<div class="dday">시작까지 D-' + dday(SCHEDULE[0].start) + '</div>';
+      statusEl.className = "statusmsg before";
+      statusEl.innerHTML =
+        '<div class="precard">' +
+          '<div class="preillo">' + CALENDAR_SVG + '</div>' +
+          '<div class="prebody">' +
+            '<span class="prebadge">주 3회, 차곡차곡</span>' +
+            '<div class="pretitle">곧 시작해요!</div>' +
+            '<div class="presub">1주차 미션은 ' + md(SCHEDULE[0].start) + '부터 열려요.<br>그때 다시 만나요 🐾</div>' +
+            '<div class="dday">시작까지 D-' + dday(SCHEDULE[0].start) + '</div>' +
+          '</div>' +
+        '</div>';
       return;
     }
+    statusEl.className = "statusmsg";
     if (p === "after") {
       bodyEl.hidden = true; statusEl.hidden = false;
       statusEl.innerHTML = '<div class="big">🎉</div><div class="st">챌린지가 끝났어요</div>' +
@@ -794,7 +836,7 @@
         var cell = document.createElement("button"); cell.type = "button"; cell.className = cls;
         var tag = done ? "" : (ws === "upcoming" ? "예정" : ws === "ended" ? "마감" : "Day");
         cell.innerHTML = done
-          ? '<span class="mark">🦋</span><span class="d num">' + d + '</span>'
+          ? '<span class="mark">🐾</span><span class="d num">' + d + '</span>'
           : '<span class="d num">' + d + '</span><span style="font-size:9px;font-weight:600;">' + tag + '</span>';
         (function (day, week) {
           cell.addEventListener("click", function () {
@@ -835,7 +877,7 @@
       box.appendChild(row);
     });
     var bar = document.createElement("div"); bar.className = "totalbar";
-    bar.innerHTML = '<span class="lab">지금까지 받은 금액</span><span class="val num">' + won(total) + '<span class="u">원</span> <span class="u">/ 최대 ' + won(MAX_REWARD) + '원</span></span>';
+    bar.innerHTML = '<span class="lab">지급받을 금액</span><span class="val num">' + won(total) + '<span class="u">원</span> <span class="u">/ 최대 ' + won(MAX_REWARD) + '원</span></span>';
     box.appendChild(bar);
   }
 
